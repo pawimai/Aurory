@@ -1,13 +1,52 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiX, FiArrowRight, FiStar, FiTrash2 } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import Link from "next/link";
+import axios from "axios";
 
 export default function Diary() {
     const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
-    const [isStarred, setIsStarred] = useState(false); // state สำหรับ toggle ดาว
+    const [isStarred, setIsStarred] = useState(false);
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
+    const [date, setDate] = useState<string>("");
+    const [story, setStory] = useState<string>("");
+
+    useEffect(() => {
+        // Fetch the date from the previous page (assuming it's passed via query params)
+        const urlParams = new URLSearchParams(window.location.search);
+        const dateParam = urlParams.get('date');
+        setDate(dateParam || "");
+
+        // Check if the date exists in the database for the current user
+        const checkDateExists = async () => {
+            try {
+                const response = await axios.post('/api/check-date', { date: dateParam });
+                setShowDeleteButton(response.data.exists);
+            } catch (error) {
+                console.error("Error checking date:", error);
+            }
+        };
+
+        if (dateParam) {
+            checkDateExists();
+        }
+    }, []);
+
+    const handleSubmit = async () => {
+        try {
+            const response = await axios.post('/api/diary', {
+                date,
+                emotion: selectedEmotion,
+                story,
+                isStarred,
+            });
+            console.log('Entry saved:', response.data);
+        } catch (error) {
+            console.error('Error saving entry:', error);
+        }
+    };
 
     const emotions = [
         { name: "Sad", icon: "/sad.png", color: "text-[#00B5E1]", colorCode: "#64B7E1" },
@@ -87,16 +126,23 @@ export default function Diary() {
                             className="w-full h-40 border-4 border-[#FFA6C2] rounded-lg p-3 focus:outline-none text-[#696A7C] shadow-lg"
                             placeholder="Write Something..."
                             style={{ resize: "none" }} // ป้องกันการขยายขนาด
+                            value={story}
+                            onChange={(e) => setStory(e.target.value)}
                         ></textarea>
 
                     </div>
 
                     {/* Submit Button - Stick to Bottom Right */}
                     <div className="flex justify-end mt-6 gap-2">
-                        <button className="flex items-center p-3 rounded-full text-[#C5524C] bg-[#FFCFDD]">
-                            <FiTrash2 size={20} />
-                        </button>
-                        <button className="flex items-center px-6 py-2 rounded-full text-white bg-[#FFC65B]">
+                        {showDeleteButton && (
+                            <button className="flex items-center p-3 rounded-full text-[#C5524C] bg-[#FFCFDD]">
+                                <FiTrash2 size={20} />
+                            </button>
+                        )}
+                        <button
+                            className="flex items-center px-6 py-2 rounded-full text-white bg-[#FFC65B]"
+                            onClick={handleSubmit}
+                        >
                             Submit <FiArrowRight className="ml-2" />
                         </button>
                     </div>
@@ -110,9 +156,6 @@ export default function Diary() {
                         </button>
                     </Link>
                 </div>
-
-
-
             </div>
         </div>
     );
