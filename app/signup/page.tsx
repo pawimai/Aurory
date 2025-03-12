@@ -1,7 +1,21 @@
 "use client"
 import Image from "next/image";
+import { useState } from "react";
+import { FiAlertTriangle } from "react-icons/fi";
 
 export default function Register() {
+    const [error, setError] = useState<React.ReactNode>("");
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError(
+            <span>
+                <FiAlertTriangle className="inline mr-2" />
+                Check your details and try again
+            </span>
+        );
+    };
+
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
             {/* Background Image */}
@@ -33,7 +47,14 @@ export default function Register() {
                         Create Account
                     </h1>
 
-                    <form className="space-y-5" action="#">
+                    {/* Alert Message */}
+                    {error && (
+                        <div className="bg-[#FFDAD7] border border-[#E66A63] text-[#65090E] px-4 py-3 rounded-[10px] relative mb-4 text-center">
+                            {error}
+                        </div>
+                    )}
+
+                    <form className="space-y-5" onSubmit={handleSubmit}>
                         {/* Username Input */}
                         <div>
                             <label htmlFor="username" className="block text-[1.2rem] text-[#696A7C] mb-2">
@@ -81,20 +102,20 @@ export default function Register() {
 
                         {/* Confirm password Input */}
                         <div>
-                            <label htmlFor="password" className="block text-[1.2rem] text-[#696A7C] mb-2">
+                            <label htmlFor="confirm-password" className="block text-[1.2rem] text-[#696A7C] mb-2">
                                 Confirm password
                             </label>
                             <input
                                 type="password"
-                                name="password"
-                                id="password"
+                                name="confirm-password"
+                                id="confirm-password"
                                 className="bg-gray-50 border border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[50px] w-full px-4"
                                 placeholder="Enter confirm password"
                                 required
                             />
                         </div>
 
-                        {/* Login Button */}
+                        {/* Register Button */}
                         <button
                             type="submit"
                             className="w-full bg-[#FFC65B] text-white font-bold text-[1.2rem] rounded-[20px] h-[55px]"
@@ -102,7 +123,7 @@ export default function Register() {
                             Register
                         </button>
 
-                        {/* Register Link */}
+                        {/* Login Link */}
                         <p className="text-center text-sm text-[#696A7C]">
                             Have an account?{' '}
                             <a href="/" className="font-medium text-[#64B7E1] underline">
