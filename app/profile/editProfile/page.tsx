@@ -11,10 +11,11 @@ export default function EditProfile() {
     const [selectedAvatar, setSelectedAvatar] = useState("/baby_chick.svg");
 
     const avatars = [
-        "/baby_chick_love.svg",
+        "/baby_chick_sleep.svg",
         "/baby_chick_angry.svg",
         "/baby_chick.svg",
         "/baby_chick_cry.svg",
+        "/baby_chick_love.svg",
     ];
 
     return (
@@ -86,9 +87,9 @@ export default function EditProfile() {
 
                     {/* Avatar Selection */}
                     <p className="text-gray-500 mt-3 text-left w-full">Select your avatar</p>
-                    <div className="flex space-x-3 mt-2">
+                    <div className="flex space-x-3 mt-2 w-full justify-center">
                         {avatars.map((avatar, index) => (
-                            <button key={index} onClick={() => setSelectedAvatar(avatar)} className={`w-28 h-28 rounded-full p-1 ${selectedAvatar === avatar ? 'border-4 border-yellow-400' : 'border-2 border-transparent'}`}>
+                            <button key={index} onClick={() => setSelectedAvatar(avatar)} className={`w-24 h-24 rounded-full p-1 ${selectedAvatar === avatar ? 'border-4 border-yellow-400' : 'border-2 border-transparent'}`}>
                                 <img src={avatar} alt={`Avatar ${index}`} className="w-full h-full rounded-full object-cover" />
                             </button>
                         ))}
