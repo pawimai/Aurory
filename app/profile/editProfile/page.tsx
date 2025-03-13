@@ -107,6 +107,11 @@ export default function EditProfile() {
         }
     };
 
+    const Logout = () => {
+        Cookies.remove('token');
+        window.location.href = '/';
+    }
+
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
             {/* Background Image */}
@@ -163,7 +168,7 @@ export default function EditProfile() {
                                 </div>
                             </div>
 
-                            <button className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
+                            <button onClick={Logout} className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
                                 Logout
                             </button>
                         </CardContent>
@@ -190,7 +195,7 @@ export default function EditProfile() {
                             <div className="relative w-[50%]">
                                 <input
                                     className="w-full text-[#696A7C] pb-2 border-b-2 border-[#696A7C] text-center text-[1.5rem] pr-8"
-                                    value={ newUsername}
+                                    value={newUsername}
                                     onChange={(e) => setNewUsername(e.target.value)}
                                 />
                                 {username && (

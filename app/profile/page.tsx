@@ -45,6 +45,11 @@ export default function Profile() {
         }
     };
 
+    const Logout = () => {
+        Cookies.remove('token');
+        window.location.href = '/';
+    }
+
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
             {/* Background Image */}
@@ -108,7 +113,7 @@ export default function Profile() {
                                 </div>
                             </div>
 
-                            <button className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
+                            <button onClick={() => Logout()} className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
                                 Logout
                             </button>
                         </CardContent>
