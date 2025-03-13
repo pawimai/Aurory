@@ -1,19 +1,85 @@
-"use client"
+"use client";
 import Image from "next/image";
 import { useState } from "react";
 import { FiAlertTriangle } from "react-icons/fi";
 
 export default function Register() {
-    const [error, setError] = useState<React.ReactNode>("");
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const [error, setError] = useState<React.ReactNode>("");
+    const [success, setSuccess] = useState<string>("");
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(
-            <span>
-                <FiAlertTriangle className="inline mr-2" />
-                Check your details and try again
-            </span>
-        );
+        setError("");
+        setSuccess("");
+
+        console.log("Form Data:", formData);
+
+        // ตรวจสอบว่ารหัสผ่านตรงกันหรือไม่
+        if (formData.password !== formData.confirmPassword) {
+            setError(
+                <span>
+                    <FiAlertTriangle className="inline mr-2" />
+                    Passwords do not match
+                </span>
+            );
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                }),
+            });
+
+            const data = await response.json();
+
+            console.log("API Response:", data);
+
+            if (!response.ok) {
+                setError(
+                    <span>
+                        <FiAlertTriangle className="inline mr-2" />
+                        {data.message || "Something went wrong"}
+                    </span>
+                );
+            } else {
+                setSuccess("Registration successful!");
+                setFormData({
+                    name: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
+                });
+            }
+        } catch (error) {
+
+            console.error("API Error:", error);
+
+            setError(
+                <span>
+                    <FiAlertTriangle className="inline mr-2" />
+                    Failed to connect to server
+                </span>
+            );
+        }
     };
 
     return (
@@ -30,18 +96,14 @@ export default function Register() {
                 />
             </div>
 
-            {/* Logo Icon ติดอยู่มุมซ้ายบนตลอด */}
-            <div className="fixed top-4 left-4" >
-                <img
-                    src="/logo.png"
-                    alt="Aurory Icon"
-                    className="w-14 h-14"
-                />
-                <h6 className="text-[#696A7C] font-extrabold text-center" >Aurory</h6>
+            {/* Logo Icon */}
+            <div className="fixed top-4 left-4">
+                <img src="/logo.png" alt="Aurory Icon" className="w-14 h-14" />
+                <h6 className="text-[#696A7C] font-extrabold text-center">Aurory</h6>
             </div>
 
             {/* Content Wrapper */}
-            <div className="flex flex-col justify-between items-center flex-1 py-10 ">
+            <div className="flex flex-col justify-between items-center flex-1 py-10">
                 <div className="w-full max-w-md px-6">
                     <h1 className="text-center text-[2.25rem] font-extrabold text-[#696A7C] mb-6">
                         Create Account
@@ -53,20 +115,27 @@ export default function Register() {
                             {error}
                         </div>
                     )}
+                    {success && (
+                        <div className="bg-green-100 border border-green-500 text-green-700 px-4 py-3 rounded-[10px] relative mb-4 text-center">
+                            {success}
+                        </div>
+                    )}
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         {/* Username Input */}
                         <div>
-                            <label htmlFor="username" className="block text-[1.2rem] text-[#696A7C] mb-2">
+                            <label htmlFor="name" className="block text-[1.2rem] text-[#696A7C] mb-2">
                                 Username
                             </label>
                             <input
                                 type="text"
-                                name="username"
-                                id="username"
+                                name="name"
+                                id="name"
                                 className="bg-gray-50 border border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[50px] w-full px-4"
                                 placeholder="Enter your name"
                                 required
+                                value={formData.name}
+                                onChange={handleChange}
                             />
                         </div>
 
@@ -82,6 +151,8 @@ export default function Register() {
                                 className="bg-gray-50 border border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[50px] w-full px-4"
                                 placeholder="Enter your email"
                                 required
+                                value={formData.email}
+                                onChange={handleChange}
                             />
                         </div>
 
@@ -97,21 +168,25 @@ export default function Register() {
                                 className="bg-gray-50 border border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[50px] w-full px-4"
                                 placeholder="Enter your password"
                                 required
+                                value={formData.password}
+                                onChange={handleChange}
                             />
                         </div>
 
                         {/* Confirm password Input */}
                         <div>
-                            <label htmlFor="confirm-password" className="block text-[1.2rem] text-[#696A7C] mb-2">
+                            <label htmlFor="confirmPassword" className="block text-[1.2rem] text-[#696A7C] mb-2">
                                 Confirm password
                             </label>
                             <input
                                 type="password"
-                                name="confirm-password"
-                                id="confirm-password"
+                                name="confirmPassword"
+                                id="confirmPassword"
                                 className="bg-gray-50 border border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[50px] w-full px-4"
                                 placeholder="Enter confirm password"
                                 required
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
                             />
                         </div>
 
