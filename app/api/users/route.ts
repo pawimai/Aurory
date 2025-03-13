@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         const decoded = Service.decodeService(req);
 
         if (password !== confirmPassword) {
-            return NextResponse.json({ message: "Passwords do not match" }, { status: 400 });
+            return NextResponse.json({ message: "Passwords do not match" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
             );
 
             if (!updatedUser) {
-                return NextResponse.json({ message: "User not found" }, { status: 404 });
+                return NextResponse.json({ message: "User not found" });
             }
 
             return NextResponse.json({ message: "Password updated successfully" }, { status: 200 });

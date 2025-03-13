@@ -194,7 +194,7 @@ export default function EditProfile() {
                                     onChange={(e) => setNewUsername(e.target.value)}
                                 />
                                 {username && (
-                                    <button onClick={() => setUsername("")} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#C6CED9] rounded-full p-1 ">
+                                    <button type="button" onClick={() => setNewUsername("")} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#C6CED9] rounded-full p-1 ">
                                         <FiX size={16} className="text-[#696A7C]" />
                                     </button>
                                 )}
