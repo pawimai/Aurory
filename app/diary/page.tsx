@@ -16,6 +16,7 @@ export default function Diary() {
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const [date, setDate] = useState<string>("");
     const [story, setStory] = useState<string>("");
+    const [contentId, setContentId] = useState<string>("");
     const router = useRouter();
 
     useEffect(() => {
@@ -37,6 +38,7 @@ export default function Diary() {
                     setStory(res.data[0].story || "");
                     setSelectedEmotion(res.data[0].emotion || null);
                     setIsStarred(res.data[0].isStarred || false);
+                    setContentId(res.data[0]._id);
                 } else {
                     setStory("");
                     setSelectedEmotion(null);
@@ -191,7 +193,7 @@ export default function Diary() {
                     <div className="mt-6 w-[100%]">
                         <div className="flex" >
                             <p className="text-[#FFA6C2] font-semibold mb-2 flex items-center cursor-pointer w-fit text-[1.25rem] " >Your Story</p>
-                            <Star />
+                            <Star contentId={contentId} isStarred={isStarred} setIsStarred={setIsStarred} />
                         </div>
                         <textarea
                             className="w-full h-40 border-4 border-[#FFA6C2] rounded-lg p-3 focus:outline-none text-[#696A7C] shadow-lg"

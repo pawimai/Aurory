@@ -6,57 +6,76 @@ import { Card, CardContent } from "@mui/material";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Star from "@/app/component/Starfn";
+import axios from "axios";
+import Cookies from "js-cookie";
+
 
 // ประกาศ Type สำหรับ Favorite Item
 type FavoriteItem = {
+    _id: string;
     date: string;
-    avatar: string;
-    text: string;
+    emotion: string;
+    story: string;
+    isStarred: boolean;
 };
 
 export default function Favorite() {
-    // const [favoriteList, setFavoriteList] = useState<FavoriteItem[]>([]);
-    const [selectedAvatar, setSelectedAvatar] = useState("/baby_chick.svg");
+    const [favoriteList, setFavoriteList] = useState<FavoriteItem[]>([]);
+    const [username, setUsername] = useState<string>("");
+    const [profileImage, setProfileImage] = useState<string>("/public/baby_chick.svg");
 
-    const [favoriteList, setFavoriteList] = useState([
-        { date: "31 OCT 2024", avatar: "/baby_chick.svg", text: "Lorem ipsum dolor sit amet consectetur..." },
-        { date: "30 OCT 2024", avatar: "/baby_chick_love.svg", text: "Lorem ipsum dolor sit amet consectetur..." },
-        { date: "29 OCT 2024", avatar: "/baby_chick_angry.svg", text: "Lorem ipsum dolor sit amet consectetur..." },
-        { date: "28 OCT 2024", avatar: "/baby_chick_cry.svg", text: "Lorem ipsum dolor sit amet consectetur..." },
-    ]);
+    const fetchFavorites = async () => {
+        try {
+            const response = await axios.get("/api/favorite", {
+                headers: {
+                    Authorization: `${Cookies.get("token")}`,
+                },
+            });
 
-    // โหลดค่า Favorite จาก Local Storage
-    // useEffect(() => {
-    //     const storedFavorites = localStorage.getItem("favoriteList");
-    //     if (storedFavorites) {
-    //         setFavoriteList(JSON.parse(storedFavorites));
-    //     }
+            if (response.data.message === "Success") {
+                setFavoriteList(response.data.starredEntries);
+            } else {
+                console.error("Error fetching favorite list:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching favorite list:", error);
+        };
+    };
 
-    //     // โหลด Avatar ที่เคยบันทึกไว้
-    //     const storedAvatar = localStorage.getItem("selectedAvatar");
-    //     if (storedAvatar) {
-    //         setSelectedAvatar(storedAvatar);
-    //     }
-    // }, []);
+    const fetchUserData = async () => {
+        try {
+            const token = Cookies.get('token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
 
-    // // ฟังก์ชันเพิ่ม/ลบ Favorite
-    // const toggleFavorite = (newItem: FavoriteItem) => {
-    //     setFavoriteList((prevFavorites) => {
-    //         const isExist = prevFavorites.some((item) => item.text === newItem.text);
+            const response = await axios.get('/api/users', {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
 
-    //         if (isExist) {
-    //             // ถ้ามีอยู่ให้ลบออก
-    //             const updatedList = prevFavorites.filter((item) => item.text !== newItem.text);
-    //             localStorage.setItem("favoriteList", JSON.stringify(updatedList));
-    //             return updatedList;
-    //         } else {
-    //             // ถ้ายังไม่มีให้เพิ่มเข้าไป
-    //             const updatedList = [...prevFavorites, newItem];
-    //             localStorage.setItem("favoriteList", JSON.stringify(updatedList));
-    //             return updatedList;
-    //         }
-    //     });
-    // };
+            if (response.status === 200) {
+                setUsername(response.data.username);
+                setProfileImage(response.data.profileImage);
+            } else {
+                console.error("Error fetching user data:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchFavorites();
+        fetchUserData();
+    }, []);
+
+    const Logout = () => {
+        Cookies.remove('token');
+        window.location.href = '/';
+    }
 
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
@@ -76,9 +95,9 @@ export default function Favorite() {
                     {/* Profile Section */}
                     <div className="mb-10">
                         <div className="relative w-[120px] h-[120px] rounded-full flex items-center justify-center">
-                            <img src={selectedAvatar} alt="Profile" width={120} height={120} className="object-cover rounded-full" />
+                            <img src={profileImage} alt="Profile" width={120} height={120} className="object-cover rounded-full" />
                         </div>
-                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">Username</h1>
+                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">{username}</h1>
                     </div>
 
                     {/* Card Section */}
@@ -114,7 +133,7 @@ export default function Favorite() {
                                 </div>
                             </div>
 
-                            <button className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
+                            <button onClick={Logout} className="mt-3 bg-[#FFB3AD] text-[#C5524C] h-[40px] rounded-[10px] capitalize w-full font-extrabold">
                                 Logout
                             </button>
                         </CardContent>
@@ -143,19 +162,21 @@ export default function Favorite() {
                                     {/* Content Section */}
                                     <div className="flex flex-col px-5 py-2 bg-[#C9EEFF] rounded-b-[40px] min-h-[150px]">
                                         <div className="flex justify-between items-center ">
-                                            <span className="text-[#FF7BAC] text-[1.3rem]">{item.date}</span>
-                                            <Star />
+                                            <span className="text-[#FF7BAC] text-[1.3rem]">{item.date.split('-')[1] + " " + item.date.split('-')[2] + " " + item.date.split('-')[3]}</span>
+                                            <Star contentId={item._id} isStarred={item.isStarred} setIsStarred={(newStarred) => {
+                                                setFavoriteList(prevList => prevList.map(fav => fav._id === item._id ? { ...fav, isStarred: newStarred } : fav));
+                                            }} />
                                         </div>
 
                                         <div className="flex items-center bg-[#FFEAC3] rounded-[45px] p-4 mb-2">
                                             {/* Avatar */}
                                             <div className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center">
-                                                <img src={item.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                                                <img src={"/" + item.emotion + ".png"} alt="Avatar" className="w-full h-full rounded-full object-cover" />
                                             </div>
 
                                             {/* Text Content (รองรับข้อความยาว) */}
                                             <p className="text-gray-600 text-sm ml-4 flex-1 break-words max-w-full">
-                                                {item.text}
+                                                {item.story}
                                             </p>
                                         </div>
                                     </div>
