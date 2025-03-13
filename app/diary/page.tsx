@@ -2,12 +2,12 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FiX, FiArrowRight, FiStar, FiTrash2 } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
 import Link from "next/link";
+import Star from "../component/Starfn";
 
 export default function Diary() {
     const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
-    const [isStarred, setIsStarred] = useState(false); // state สำหรับ toggle ดาว
+
 
     const emotions = [
         { name: "Sad", icon: "/sad.png", color: "text-[#00B5E1]", colorCode: "#64B7E1" },
@@ -73,16 +73,10 @@ export default function Diary() {
 
                     {/* Story Input */}
                     <div className="mt-6 w-[100%]">
-                        <p
-                            className="text-[#FFA6C2] font-semibold mb-2 flex items-center cursor-pointer w-fit"
-                            onClick={() => setIsStarred(!isStarred)}
-                        >
-                            Your Story
-                            <span className="ml-1 text-[2rem] inline-flex p-1">
-                                {isStarred ? <FaStar className="text-[#FF60C7]" /> : <FiStar />}
-                            </span>
-                        </p>
-
+                        <div className="flex" >
+                            <p className="text-[#FFA6C2] font-semibold mb-2 flex items-center cursor-pointer w-fit text-[1.25rem] " >Your Story</p>
+                            <Star />
+                        </div>
                         <textarea
                             className="w-full h-40 border-4 border-[#FFA6C2] rounded-lg p-3 focus:outline-none text-[#696A7C] shadow-lg"
                             placeholder="Write Something..."
