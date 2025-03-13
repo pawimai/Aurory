@@ -6,14 +6,32 @@ import { FiAlertTriangle } from "react-icons/fi";
 export default function Register() {
     const [error, setError] = useState<React.ReactNode>("");
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(
-            <span>
-                <FiAlertTriangle className="inline mr-2" />
-                Check your details and try again
-            </span>
-        );
+        const form = e.target as HTMLFormElement;
+        const username = form.username as HTMLInputElement;
+        const email = form.email as HTMLInputElement;
+        const password = form.password as HTMLInputElement;
+        try {
+            await fetch('/api/signup',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username.value,
+                    email: email.value,
+                    password: password.value,
+                }),
+            })
+        } catch (error) {
+            setError(
+                <span>
+                    <FiAlertTriangle className="inline mr-2" />
+                    Check your details and try again
+                </span>
+            );
+        }
     };
 
     return (
