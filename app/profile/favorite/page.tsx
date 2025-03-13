@@ -5,6 +5,7 @@ import { FiEdit, FiHeart, FiLock, FiChevronRight } from "react-icons/fi";
 import { Card, CardContent } from "@mui/material";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Star from "@/app/component/Starfn";
 
 // ประกาศ Type สำหรับ Favorite Item
 type FavoriteItem = {
@@ -25,37 +26,37 @@ export default function Favorite() {
     ]);
 
     // โหลดค่า Favorite จาก Local Storage
-    useEffect(() => {
-        const storedFavorites = localStorage.getItem("favoriteList");
-        if (storedFavorites) {
-            setFavoriteList(JSON.parse(storedFavorites));
-        }
+    // useEffect(() => {
+    //     const storedFavorites = localStorage.getItem("favoriteList");
+    //     if (storedFavorites) {
+    //         setFavoriteList(JSON.parse(storedFavorites));
+    //     }
 
-        // โหลด Avatar ที่เคยบันทึกไว้
-        const storedAvatar = localStorage.getItem("selectedAvatar");
-        if (storedAvatar) {
-            setSelectedAvatar(storedAvatar);
-        }
-    }, []);
+    //     // โหลด Avatar ที่เคยบันทึกไว้
+    //     const storedAvatar = localStorage.getItem("selectedAvatar");
+    //     if (storedAvatar) {
+    //         setSelectedAvatar(storedAvatar);
+    //     }
+    // }, []);
 
-    // ฟังก์ชันเพิ่ม/ลบ Favorite
-    const toggleFavorite = (newItem: FavoriteItem) => {
-        setFavoriteList((prevFavorites) => {
-            const isExist = prevFavorites.some((item) => item.text === newItem.text);
+    // // ฟังก์ชันเพิ่ม/ลบ Favorite
+    // const toggleFavorite = (newItem: FavoriteItem) => {
+    //     setFavoriteList((prevFavorites) => {
+    //         const isExist = prevFavorites.some((item) => item.text === newItem.text);
 
-            if (isExist) {
-                // ถ้ามีอยู่ให้ลบออก
-                const updatedList = prevFavorites.filter((item) => item.text !== newItem.text);
-                localStorage.setItem("favoriteList", JSON.stringify(updatedList));
-                return updatedList;
-            } else {
-                // ถ้ายังไม่มีให้เพิ่มเข้าไป
-                const updatedList = [...prevFavorites, newItem];
-                localStorage.setItem("favoriteList", JSON.stringify(updatedList));
-                return updatedList;
-            }
-        });
-    };
+    //         if (isExist) {
+    //             // ถ้ามีอยู่ให้ลบออก
+    //             const updatedList = prevFavorites.filter((item) => item.text !== newItem.text);
+    //             localStorage.setItem("favoriteList", JSON.stringify(updatedList));
+    //             return updatedList;
+    //         } else {
+    //             // ถ้ายังไม่มีให้เพิ่มเข้าไป
+    //             const updatedList = [...prevFavorites, newItem];
+    //             localStorage.setItem("favoriteList", JSON.stringify(updatedList));
+    //             return updatedList;
+    //         }
+    //     });
+    // };
 
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
@@ -125,29 +126,38 @@ export default function Favorite() {
                     <h2 className="text-2xl font-bold text-[#696A7C] text-center pb-3">FAVORITE</h2>
 
                     {/* Scrollable Favorite List */}
-                    <div className="flex flex-col items-center mt-6 space-y-6 overflow-y-auto max-h-[400px] pr-4 scrollbar-thin scrollbar-thumb-[#C6E7E0] scrollbar-track-gray-100">
+                    <div className="flex flex-col items-center mt-6 space-y-6 overflow-y-auto max-h-[400px] pr-4 scrollbar-thin scrollbar-thumb-[#6DAE81] scrollbar-track-[#C7EAD4]">
                         {favoriteList.length > 0 ? (
                             favoriteList.map((item, index) => (
-                                <div key={index} className="w-[80%] bg-[#CCEDFF] rounded-2xl shadow-lg relative">
+                                <div key={index} className="w-[100%] relative p-3">
                                     {/* Header Section */}
-                                    <div className="bg-[#FFEDC2] p-4 rounded-t-2xl flex justify-between items-center relative">
-                                        <span className="text-[#FF7BAC] font-bold text-lg">{item.date}</span>
-                                        <FiHeart
-                                            className={`text-2xl cursor-pointer ${
-                                                favoriteList.some(fav => fav.text === item.text) ? "text-[#FF7BAC]" : "text-gray-400"
-                                            }`}
-                                            onClick={() => toggleFavorite(item)}
-                                        />
+                                    <div className="bg-[#FFEAC3] p-4 rounded-t-[72px] flex justify-between items-center relative">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="absolute -top-3 left-14 w-2 h-10 bg-[#FFC65B] rounded-lg"></div>
+                                            <div className="absolute -top-3 left-16 w-2 h-10 bg-[#FFC65B] rounded-lg"></div>
+                                            <div className="absolute -top-3 right-20 w-2 h-10 bg-[#FFC65B] rounded-lg"></div>
+                                            <div className="absolute -top-3 right-16 w-2 h-10 bg-[#FFC65B] rounded-lg"></div>
+                                        </div>
                                     </div>
 
                                     {/* Content Section */}
-                                    <div className="p-6 flex space-x-4">
-                                        <div className="flex-shrink-0 w-20 h-20 rounded-full bg-white flex items-center justify-center">
-                                            <img src={item.avatar} alt="Avatar" className="w-16 h-16" />
+                                    <div className="flex flex-col px-5 py-2 bg-[#C9EEFF] rounded-b-[40px] min-h-[150px]">
+                                        <div className="flex justify-between items-center ">
+                                            <span className="text-[#FF7BAC] text-[1.3rem]">{item.date}</span>
+                                            <Star />
                                         </div>
-                                        <p className="text-gray-600 text-sm">
-                                            {item.text}
-                                        </p>
+
+                                        <div className="flex items-center bg-[#FFEAC3] rounded-[45px] p-4 mb-2">
+                                            {/* Avatar */}
+                                            <div className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center">
+                                                <img src={item.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                                            </div>
+
+                                            {/* Text Content (รองรับข้อความยาว) */}
+                                            <p className="text-gray-600 text-sm ml-4 flex-1 break-words max-w-full">
+                                                {item.text}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             ))
@@ -155,6 +165,8 @@ export default function Favorite() {
                             <p className="text-gray-400">No favorites added yet.</p>
                         )}
                     </div>
+
+
                 </div>
             </div>
         </div>
