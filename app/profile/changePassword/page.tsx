@@ -3,12 +3,91 @@ import Image from "next/image";
 import Back from "../../component/backfn";
 import { FiEdit, FiHeart, FiLock, FiChevronRight, FiArrowRight, FiX } from "react-icons/fi";
 import { Card, CardContent } from "@mui/material";
-import { useState } from "react";
 import Link from "next/link";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 export default function ChangePassword() {
-    const [name, setName] = useState("Levi");
-    const [selectedAvatar, setSelectedAvatar] = useState("/baby_chick.svg");
+    const [username, setUsername] = useState<string>("");
+    const [profileImage, setProfileImage] = useState<string>("/baby_chick.svg");
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    const fetchUserData = async () => {
+        try {
+            const token = Cookies.get('token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+
+            const response = await axios.get('/api/users', {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+
+            if (response.status === 200) {
+                setUsername(response.data.username);
+                setProfileImage(response.data.profileImage);
+            } else {
+                console.error("Error fetching user data:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            const token = Cookies.get('token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+
+            const response = await axios.post('/api/users', {
+                password: newPassword,
+                confirmPassword: confirmPassword
+            }, {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+
+            if (response.data.message === "Password updated successfully") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Password updated successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                setNewPassword("");
+                setConfirmPassword("");
+
+            } else if (response.data.message === "Passwords do not match") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Passwords do not match',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                console.log("Error updating password:", response.data.message);
+            }
+
+        } catch (error) {
+            console.log("Error updating password:", error);
+        }
+    };
+
 
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
@@ -28,9 +107,9 @@ export default function ChangePassword() {
                     {/* Profile Section */}
                     <div className="mb-10">
                         <div className="relative w-[120px] h-[120px] rounded-full flex items-center justify-center">
-                            <img src={selectedAvatar} alt="Profile" width={120} height={120} className="object-cover" />
+                            <img src={profileImage} alt="Profile" width={120} height={120} className="object-cover" />
                         </div>
-                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">Username</h1>
+                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">{username}</h1>
                     </div>
 
                     {/* Card Section */}
@@ -79,33 +158,37 @@ export default function ChangePassword() {
                     <h4>Enter your new password below, we’re<br></br> just being extra safe</h4>
 
                     <div className="flex flex-col justify-center items-center mt-10" >
-                        <form className="space-y-5 w-[70%] " action="#">
-                            {/* Email Input */}
+                        <form className="space-y-5 w-[70%]" onSubmit={handleSubmit}>
+                            {/* New Password Input */}
                             <div>
-                                <label htmlFor="password" className="block text-[1.2rem] text-[#696A7C] mb-2 text-start ">
+                                <label htmlFor="newPassword" className="block text-[1.2rem] text-[#696A7C] mb-2 text-start">
                                     New password
                                 </label>
                                 <input
-                                    type="text"
-                                    name="password"
-                                    id="password"
+                                    type="password"
+                                    name="newPassword"
+                                    id="newPassword"
                                     className="bg-gray-50 border border-2 border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[40px] w-full px-4"
                                     placeholder="Enter new password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
                                     required
                                 />
                             </div>
 
-                            {/* Password Input */}
+                            {/* Confirm Password Input */}
                             <div>
-                                <label htmlFor="password" className="block text-[1.2rem] text-[#696A7C] mb-2 text-start">
+                                <label htmlFor="confirmPassword" className="block text-[1.2rem] text-[#696A7C] mb-2 text-start">
                                     Confirm password
                                 </label>
                                 <input
-                                    type="text"
-                                    name="password"
-                                    id="password"
+                                    type="password"
+                                    name="confirmPassword"
+                                    id="confirmPassword"
                                     className="bg-gray-50 border border-2 border-[#C6CED9] text-[#696A7C] rounded-[10px] h-[40px] w-full px-4"
                                     placeholder="Enter confirm password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                     required
                                 />
                             </div>

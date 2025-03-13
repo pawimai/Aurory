@@ -1,23 +1,38 @@
-import { NextResponse } from "next/server";
-import connectDB from "../../utils/connectDB";
-import User from "../models/User";
+import { NextRequest, NextResponse } from "next/server";
+import { connectMongoDB } from "@/lib/mongodb";
+import Users from "@/models/Users";
+import bcrypt from "bcryptjs";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        await connectDB(); // เชื่อมต่อฐานข้อมูล
+        await connectMongoDB();
+        const { username, email, password, confirmPassword } = await req.json();
 
-        const { username, email, password } = await req.json();
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return NextResponse.json({ message: "Email already exists" }, { status: 400 });
+        if (!username || !email || !password || !confirmPassword) {
+            return NextResponse.json({ message: "Missing required fields" });
         }
 
-        const newUser = new User({ username, email, password });
+        if (password !== confirmPassword) {
+            return NextResponse.json({ message: "Passwords do not match" });
+        }
+
+        const existingUser = await Users.findOne({
+            $or: [{ username }, { email }]
+        });
+
+        if (existingUser) {
+            return NextResponse.json({ message: "Username or Email already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new Users({ username, email, password: hashedPassword });
         await newUser.save();
 
-        return NextResponse.json({ message: "User created successfully" }, { status: 201 });
+        return NextResponse.json({ message: "User registered successfully" }, { status: 201 });
+
     } catch (error) {
-        return NextResponse.json({ message: "Server error" }, { status: 500 });
+        console.log("Error saving user:", error);
+        return NextResponse.json({ message: "Internal Server Error" });
     }
 }

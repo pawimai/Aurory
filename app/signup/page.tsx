@@ -1,19 +1,54 @@
 "use client"
 import Image from "next/image";
 import { useState } from "react";
-import { FiAlertTriangle } from "react-icons/fi";
+import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
+import axios from "axios";
 
 export default function Register() {
     const [error, setError] = useState<React.ReactNode>("");
+    const [success, setSuccess] = useState<React.ReactNode>("");
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(
-            <span>
-                <FiAlertTriangle className="inline mr-2" />
-                Check your details and try again
-            </span>
-        );
+        const formData = new FormData(e.currentTarget);
+        const data = {
+            username: formData.get("username"),
+            email: formData.get("email"),
+            password: formData.get("password"),
+            confirmPassword: formData.get("confirm-password"),
+        };
+
+        try {
+            await axios.post('/api/signup', data).then(res => {
+                if (res.status === 201) {
+                    setError("")
+                    setSuccess(
+                        <span>
+                            <FiCheckCircle className="inline mr-2" />
+                            registered successfully!{' '}
+                            <u><a href="/">Login Click Me!</a></u>
+                        </span>
+                    );
+                } else {
+                    setSuccess("")
+                    setError(
+                        <span>
+                            <FiAlertTriangle className="inline mr-2" />
+                            {res.data.message}
+                        </span>
+                    );
+                }
+            })
+        } catch (error) {
+            console.error('Error during registration:', error);
+            setSuccess("")
+            setError(
+                <span>
+                    <FiAlertTriangle className="inline mr-2" />
+                    Check your details and try again
+                </span>
+            );
+        }
     };
 
     return (
@@ -51,6 +86,11 @@ export default function Register() {
                     {error && (
                         <div className="bg-[#FFDAD7] border border-[#E66A63] text-[#65090E] px-4 py-3 rounded-[10px] relative mb-4 text-center">
                             {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className="bg-[#D1E7DD] border border-[#0F5132] text-[#0F5132] px-4 py-3 rounded-[10px] relative mb-4 text-center">
+                            {success}
                         </div>
                     )}
 

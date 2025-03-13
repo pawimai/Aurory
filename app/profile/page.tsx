@@ -7,8 +7,44 @@ import { FiLock } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import { Card, CardContent } from '@mui/material';
 import Link from "next/link";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 export default function Profile() {
+
+    const [username, setUsername] = useState<string>("");
+    const [profileImage, setProfileImage] = useState<string>("");
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    const fetchUserData = async () => {
+        try {
+            const token = Cookies.get('token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+
+            const response = await axios.get('/api/users', {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+
+            if (response.status === 200) {
+                setUsername(response.data.username);
+                setProfileImage(response.data.profileImage);
+            } else {
+                console.error("Error fetching user data:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
+
     return (
         <div className="flex flex-col min-h-screen w-full relative overflow-hidden">
             {/* Background Image */}
@@ -34,9 +70,9 @@ export default function Profile() {
                     {/* Profile Section */}
                     <div className="mb-10">
                         <div className="relative w-[120px] h-[120px] rounded-full flex items-center justify-center">
-                            <img src="/baby_chick.svg" alt="Profile" width={120} height={120} className="object-cover" />
+                            <img src= { profileImage || "/baby_chick.svg" } alt="Profile" width={120} height={120} className="object-cover" />
                         </div>
-                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">Username</h1>
+                        <h1 className="text-[#696A7C] text-[1.5rem] mt-3 text-center">{ username }</h1>
                     </div>
 
                     {/* Card Section */}

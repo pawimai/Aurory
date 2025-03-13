@@ -5,6 +5,9 @@ import { FiX, FiArrowRight, FiStar, FiTrash2 } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import Link from "next/link";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 export default function Diary() {
     const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
@@ -12,6 +15,7 @@ export default function Diary() {
     const [showDeleteButton, setShowDeleteButton] = useState(false);
     const [date, setDate] = useState<string>("");
     const [story, setStory] = useState<string>("");
+    const router = useRouter();
 
     useEffect(() => {
         // Fetch the date from the previous page (assuming it's passed via query params)
@@ -22,8 +26,21 @@ export default function Diary() {
         // Check if the date exists in the database for the current user
         const checkDateExists = async () => {
             try {
-                const response = await axios.post('/api/check-date', { date: dateParam });
-                setShowDeleteButton(response.data.exists);
+                const res = await axios.get('/api/diary?date=' + dateParam, {
+                    headers: {
+                        Authorization: `${Cookies.get('token')}`
+                    }
+                });
+                if (res.data.length > 0) {
+                    setShowDeleteButton(true);
+                    setStory(res.data[0].story || "");
+                    setSelectedEmotion(res.data[0].emotion || null);
+                    setIsStarred(res.data[0].isStarred || false);
+                } else {
+                    setStory("");
+                    setSelectedEmotion(null);
+                    setIsStarred(false);
+                }
             } catch (error) {
                 console.error("Error checking date:", error);
             }
@@ -36,16 +53,75 @@ export default function Diary() {
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.post('/api/diary', {
+            await axios.post('/api/diary', {
                 date,
                 emotion: selectedEmotion,
                 story,
                 isStarred,
-            });
-            console.log('Entry saved:', response.data);
+            }, {
+                headers: {
+                    Authorization: `${Cookies.get('token')}`
+                }
+            }).then(res => {
+                if (res.data.message === "Missing required fields") {
+                    Swal.fire({
+                        title: 'Missing required fields',
+                        icon: 'error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Diary entry saved',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    router.push('/home');
+                });
+
+            })
         } catch (error) {
             console.error('Error saving entry:', error);
         }
+    };
+
+    const handleDelete = async () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axios.delete('/api/diary?date=' + date, {
+                        headers: {
+                            Authorization: `${Cookies.get('token')}`
+                        }
+                    });
+                    console.log('Entry deleted');
+                    setStory("");
+                    setSelectedEmotion(null);
+                    setIsStarred(false);
+                    setShowDeleteButton(false);
+
+                    Swal.fire({
+                        title: 'Diary entry deleted',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        router.push('/home');
+                    });
+                } catch (error) {
+                    console.error('Error deleting entry:', error);
+                }
+            }
+        });
     };
 
     const emotions = [
@@ -73,10 +149,10 @@ export default function Diary() {
                     <div className="absolute -top-3 right-10 w-1 h-8 bg-[#FF60C7] rounded-lg"></div>
 
                     <p className="text-[2.25rem] font-bold flex items-center justify-center h-1/2 bg-[#FFA6C2] w-full rounded-t-lg">
-                        December 2024
+                        {date.split('-')[2] + " " + date.split('-')[3]}
                     </p>
                     <p className="text-[1.8rem] flex items-center justify-center h-1/2 bg-[#FFCFDD] w-full text-[#696A7C] rounded-b-lg">
-                        WED 25
+                        {date.split('-')[0] + " " + date.split('-')[1]}
                     </p>
                 </div>
 
@@ -135,7 +211,7 @@ export default function Diary() {
                     {/* Submit Button - Stick to Bottom Right */}
                     <div className="flex justify-end mt-6 gap-2">
                         {showDeleteButton && (
-                            <button className="flex items-center p-3 rounded-full text-[#C5524C] bg-[#FFCFDD]">
+                            <button className="flex items-center p-3 rounded-full text-[#C5524C] bg-[#FFCFDD]" onClick={handleDelete}>
                                 <FiTrash2 size={20} />
                             </button>
                         )}

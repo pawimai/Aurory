@@ -3,11 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import { FiAlertTriangle } from "react-icons/fi";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [error, setError] = useState<React.ReactNode>("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const email = (e.target as any).email.value;
     const password = (e.target as any).password.value;
@@ -21,7 +25,28 @@ export default function Login() {
       );
     } else {
       setError("");
-      console.log("Logging in...");
+      try {
+        const response = await axios.post('/api/login', { email, password });
+        if (response.data.token) {
+          Cookies.set('token', response.data.token, { expires: 7 });
+          router.push('/home');
+        } else {
+          setError(
+            <span>
+              <FiAlertTriangle className="inline mr-2" />
+              {response.data.message}
+            </span>
+          );
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        setError(
+          <span>
+            <FiAlertTriangle className="inline mr-2" />
+            Check your details and try again
+          </span>
+        );
+      }
     }
   };
 
@@ -49,7 +74,7 @@ export default function Login() {
       <div className="flex flex-col justify-between items-center flex-1 py-10 mt-16">
         <div className="w-full max-w-md px-6">
           <h1 className="text-center text-[2.25rem] font-extrabold text-[#696A7C] mb-6">Login</h1>
-          
+
           {/* Custom Alert */}
           {error && (
             <div className="bg-[#FFDAD7] border border-[#E66A63] text-[#65090E] px-4 py-3 rounded-[10px] relative mb-4 text-center">
