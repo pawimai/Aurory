@@ -168,11 +168,11 @@ export default function Diary() {
                                 <div
                                     key={emotion.name}
                                     className="flex flex-col items-center cursor-pointer p-2 rounded-lg transition-all hover:opacity-100"
-                                    onClick={() => setSelectedEmotion(emotion.name)}
+                                    onClick={() => setSelectedEmotion(emotion.icon)}
                                 >
                                     <div
                                         className={`rounded-lg transition-all ${selectedEmotion
-                                            ? selectedEmotion === emotion.name
+                                            ? selectedEmotion === emotion.icon
                                                 ? "border-4"
                                                 : "opacity-40"
                                             : "" // ถ้าไม่มีการเลือก emotion ใดๆ opacity ไม่เปลี่ยน

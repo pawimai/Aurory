@@ -180,7 +180,7 @@ export default function Favorite() {
                                         <div className="flex items-center bg-[#FFEAC3] rounded-[45px] p-4 mb-2">
                                             {/* Avatar */}
                                             <div className="flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center">
-                                                <img src={"/" + item.emotion + ".png"} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                                                <img src={item.emotion} alt="Avatar" className="w-full h-full rounded-full object-cover" />
                                             </div>
 
                                             {/* Text Content (รองรับข้อความยาว) */}
