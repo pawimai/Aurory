@@ -129,10 +129,10 @@ export default function Diary() {
 
     const emotions = [
         { name: "Sad", icon: "/sad.png", color: "text-[#00B5E1]", colorCode: "#64B7E1" },
-        { name: "Surprise", icon: "/surprise.png", color: "text-[#FF419E]", colorCode: "#FFA6C2" },
+        { name: "Surprise", icon: "/Surprise.png", color: "text-[#FF419E]", colorCode: "#FFA6C2" },
         { name: "Happy", icon: "/happy.png", color: "text-[#0E825E]", colorCode: "#8BC8B8" },
         { name: "So so", icon: "/soso.png", color: "text-[#FFBF00]", colorCode: "#FFC65B" },
-        { name: "Angry", icon: "/angry.png", color: "text-[#ED3B20]", colorCode: "#FF6940" },
+        { name: "Angry", icon: "/Angry.png", color: "text-[#ED3B20]", colorCode: "#FF6940" },
     ];
 
     return (
