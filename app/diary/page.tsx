@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { FiX, FiArrowRight, FiStar, FiTrash2 } from "react-icons/fi";
+import { FiX, FiArrowRight, FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
 import Star from "../component/Starfn";
 import axios from "axios";

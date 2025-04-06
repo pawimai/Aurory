@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import axios from "axios";
+import Link from "next/link";
 
 export default function Register() {
     const [error, setError] = useState<React.ReactNode>("");
@@ -26,7 +27,7 @@ export default function Register() {
                         <span>
                             <FiCheckCircle className="inline mr-2" />
                             registered successfully!{' '}
-                            <u><a href="/">Login Click Me!</a></u>
+                            <u><Link href="/">Login Click Me!</Link></u>
                         </span>
                     );
                 } else {
@@ -166,9 +167,9 @@ export default function Register() {
                         {/* Login Link */}
                         <p className="text-center text-sm text-[#696A7C]">
                             Have an account?{' '}
-                            <a href="/" className="font-medium text-[#64B7E1] underline">
+                            <Link href="/" className="font-medium text-[#64B7E1] underline">
                                 Log in
-                            </a>
+                            </Link>
                         </p>
                     </form>
                 </div>

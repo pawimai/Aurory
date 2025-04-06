@@ -13,6 +13,7 @@ const Service = {
             decoded = jwt.verify(token, process.env.secret_key || "Devmode") as jwt.JwtPayload;
             return decoded;
         } catch (error) {
+            console.log(error)
             return NextResponse.json({ message: "Invalid token" }, { status: 401 });
         }
     }

@@ -163,9 +163,18 @@ export default function Favorite() {
                                     <div className="flex flex-col px-5 py-2 bg-[#C9EEFF] rounded-b-[40px] min-h-[150px]">
                                         <div className="flex justify-between items-center ">
                                             <span className="text-[#FF7BAC] text-[1.3rem]">{item.date.split('-')[1] + " " + item.date.split('-')[2] + " " + item.date.split('-')[3]}</span>
-                                            <Star contentId={item._id} isStarred={item.isStarred} setIsStarred={(newStarred) => {
-                                                setFavoriteList(prevList => prevList.map(fav => fav._id === item._id ? { ...fav, isStarred: newStarred } : fav));
-                                            }} />
+                                            <Star
+                                                contentId={item._id}
+                                                isStarred={item.isStarred}
+                                                setIsStarred={(newStarred) => {
+                                                    setFavoriteList((prevList) =>
+                                                        prevList.map((fav) =>
+                                                            fav._id === item._id ? { ...fav, isStarred: Boolean(newStarred) } : fav
+                                                        )
+                                                    );
+                                                    return newStarred;
+                                                }}
+                                            />
                                         </div>
 
                                         <div className="flex items-center bg-[#FFEAC3] rounded-[45px] p-4 mb-2">

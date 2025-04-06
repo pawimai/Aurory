@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         }
 
         try {
-            let user = await Users.findOne({ email });
+            const user = await Users.findOne({ email });
             if (!user) {
               return NextResponse.json({ message: "Invalid Email" });
             }
@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
         
             return NextResponse.json({ token }, { status: 200 });
           } catch (error) {
+            console.log(error)
             return NextResponse.json({ message: "Server error" });
           }
           

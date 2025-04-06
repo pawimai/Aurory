@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-console.log("📌 DATABASE_URL:", process.env.DATABASE_URL);
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 
 if (!process.env.DATABASE_URL) {
@@ -9,8 +9,11 @@ if (!process.env.DATABASE_URL) {
 
 const DATABASE_URL: string = process.env.DATABASE_URL;
 
-let globalWithMongoose = global as typeof globalThis & {
-    mongoose: any;
+const globalWithMongoose = global as typeof globalThis & {
+    mongoose: {
+        conn: mongoose.Connection | null;
+        promise: Promise<mongoose.Mongoose> | null;
+    };
 };
 
 let cached = globalWithMongoose.mongoose;
@@ -42,7 +45,7 @@ async function connectDB() {
     }
 
     try {
-        cached.conn = await cached.promise;
+        cached.conn = mongoose.connection;
         return cached.conn;
     } catch (error) {
         console.error("Database connection failed:", error);

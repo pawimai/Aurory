@@ -1,7 +1,7 @@
 "use client";
 import { FaStar } from "react-icons/fa";
 import { FiStar } from "react-icons/fi";
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 

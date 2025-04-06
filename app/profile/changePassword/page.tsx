@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image";
 import Back from "../../component/backfn";
-import { FiEdit, FiHeart, FiLock, FiChevronRight, FiArrowRight, FiX } from "react-icons/fi";
+import { FiEdit, FiHeart, FiLock, FiChevronRight, FiArrowRight } from "react-icons/fi";
 import { Card, CardContent } from "@mui/material";
 import Link from "next/link";
 import axios from "axios";
