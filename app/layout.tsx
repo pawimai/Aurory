@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Aurory",
   description: "diary",
+  icons:'/logo.png',
 };
 
 export default function RootLayout({
